@@ -1,0 +1,22 @@
+# Build directories
+build/
+builds/
+Builds/
+cmake-build-*/
+
+# IDE
+.idea/
+.vscode/
+*.xcodeproj/
+*.xcworkspace/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# VYBR pending sync
+.vybr/pending_sync.yaml

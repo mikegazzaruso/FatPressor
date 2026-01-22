@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FatPressor</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="plugin-container">
+    <!-- Header with Preset System -->
+    <div class="header">
+      <div class="logo" id="logoBtn" title="About FatPressor">FATPRESSOR</div>
+
+      <div class="preset-system">
+        <div class="preset-nav" id="presetPrev">◀</div>
+        <div class="preset-name" id="presetName">
+          <span class="preset-name-text" id="presetNameText">Default</span>
+          <span class="preset-dropdown-arrow">▼</span>
+        </div>
+        <div class="preset-nav" id="presetNext">▶</div>
+        <button class="preset-save-btn" id="presetSaveBtn" title="Save User Preset">+</button>
+
+        <!-- Preset Browser Dropdown -->
+        <div class="preset-browser" id="presetBrowser">
+          <div class="preset-browser-header">
+            <span class="preset-browser-title">PRESETS</span>
+          </div>
+          <div class="preset-categories" id="presetCategories">
+            <!-- Categories populated by JS -->
+          </div>
+          <div class="preset-list" id="presetList">
+            <!-- Presets populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Spacer to balance header (same width as logo) -->
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- Delete Preset Confirmation Modal -->
+    <div class="preset-delete-modal" id="presetDeleteModal">
+      <div class="preset-delete-content">
+        <div class="preset-delete-header">DELETE PRESET</div>
+        <div class="preset-delete-message">Delete "<span id="presetDeleteName"></span>"?</div>
+        <div class="preset-delete-buttons">
+          <button class="preset-delete-cancel" id="presetDeleteCancel">Cancel</button>
+          <button class="preset-delete-confirm" id="presetDeleteConfirm">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save Preset Modal (positioned outside header for proper overlay) -->
+    <div class="preset-save-modal" id="presetSaveModal">
+      <div class="preset-save-content">
+        <div class="preset-save-header">SAVE PRESET</div>
+        <input type="text" class="preset-save-input" id="presetSaveName" placeholder="Preset name...">
+
+        <!-- Custom styled dropdown -->
+        <div class="custom-dropdown" id="categoryDropdown">
+          <div class="custom-dropdown-selected" id="categorySelected">
+            <span class="custom-dropdown-text">Uncategorized</span>
+            <span class="custom-dropdown-arrow">▼</span>
+          </div>
+          <div class="custom-dropdown-options" id="categoryOptions">
+            <div class="custom-dropdown-option" data-value="Drums">Drums</div>
+            <div class="custom-dropdown-option" data-value="Vocals">Vocals</div>
+            <div class="custom-dropdown-option" data-value="Bass">Bass</div>
+            <div class="custom-dropdown-option" data-value="Mix Bus">Mix Bus</div>
+            <div class="custom-dropdown-option active" data-value="Uncategorized">Uncategorized</div>
+          </div>
+        </div>
+        <input type="hidden" id="presetSaveCategory" value="Uncategorized">
+
+        <div class="preset-save-buttons">
+          <button class="preset-save-cancel" id="presetSaveCancel">Cancel</button>
+          <button class="preset-save-confirm" id="presetSaveConfirm">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Section: Wide Graph + FAT -->
+    <div class="main-section">
+      <!-- Compression Graph - Wide -->
+      <div class="graph-container">
+        <div class="graph-header">COMPRESSION CURVE</div>
+
+        <div class="graph-info">
+          <div class="graph-info-item">THR <span class="graph-info-value" id="thrDisplay">-20dB</span></div>
+          <div class="graph-info-item">RAT <span class="graph-info-value" id="ratDisplay">4:1</span></div>
+          <div class="graph-info-item">GR <span class="graph-info-value" id="grDisplay">0.0dB</span></div>
+        </div>
+
+        <svg class="graph-svg" viewBox="0 0 560 240" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="curveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#ff9500;stop-opacity:0.3" />
+              <stop offset="100%" style="stop-color:#ff9500;stop-opacity:0" />
+            </linearGradient>
+            <!-- Dynamic glow filter for curve and threshold -->
+            <filter id="curveGlow" x="-50%" y="-200%" width="200%" height="500%" filterUnits="objectBoundingBox">
+              <feGaussianBlur id="curveBlur1" stdDeviation="4" result="blur1"/>
+              <feGaussianBlur id="curveBlur2" stdDeviation="8" result="blur2"/>
+              <feMerge>
+                <feMergeNode in="blur2"/>
+                <feMergeNode in="blur1"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="pointGlow" x="-300%" y="-300%" width="700%" height="700%" filterUnits="objectBoundingBox">
+              <feGaussianBlur id="pointBlur1" stdDeviation="6" result="blur1"/>
+              <feGaussianBlur id="pointBlur2" stdDeviation="12" result="blur2"/>
+              <feMerge>
+                <feMergeNode in="blur2"/>
+                <feMergeNode in="blur1"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Grid lines - vertical -->
+          <line class="grid-line" x1="60" y1="30" x2="60" y2="200" />
+          <line class="grid-line" x1="140" y1="30" x2="140" y2="200" />
+          <line class="grid-line" x1="220" y1="30" x2="220" y2="200" />
+          <line class="grid-line" x1="300" y1="30" x2="300" y2="200" />
+          <line class="grid-line" x1="380" y1="30" x2="380" y2="200" />
+          <line class="grid-line" x1="460" y1="30" x2="460" y2="200" />
+
+          <!-- Grid lines - horizontal -->
+          <line class="grid-line" x1="60" y1="58" x2="520" y2="58" />
+          <line class="grid-line" x1="60" y1="100" x2="520" y2="100" />
+          <line class="grid-line" x1="60" y1="142" x2="520" y2="142" />
+          <line class="grid-line" x1="60" y1="200" x2="520" y2="200" />
+
+          <!-- 1:1 reference line -->
+          <line class="reference-line" x1="60" y1="200" x2="520" y2="30" />
+
+          <!-- Threshold lines -->
+          <line class="threshold-line-v" id="thresholdLineV" x1="340" y1="30" x2="340" y2="200" />
+          <line class="threshold-line-h" id="thresholdLineH" x1="60" y1="72" x2="520" y2="72" />
+
+          <!-- Fill under compression curve -->
+          <path class="compression-fill" id="compressionFill"
+                d="M 60 200 L 300 72 Q 340 50, 380 46 L 520 38 L 520 200 Z" />
+
+          <!-- Compression curve - with dynamic glow filter -->
+          <path class="compression-curve" id="compressionCurve"
+                d="M 60 200 L 300 72 Q 340 50, 380 46 L 520 38" filter="url(#curveGlow)" />
+
+          <!-- Threshold point (draggable) - with dynamic glow filter -->
+          <circle class="threshold-point" id="thresholdPoint" cx="340" cy="54" r="9" filter="url(#pointGlow)" />
+
+          <!-- Axis labels -->
+          <text class="axis-label" x="290" y="234" text-anchor="middle">INPUT (dB)</text>
+          <text class="axis-label" x="18" y="115" text-anchor="middle" transform="rotate(-90, 18, 115)">OUTPUT (dB)</text>
+
+          <!-- Axis values - X -->
+          <text class="axis-value" x="60" y="214">-60</text>
+          <text class="axis-value" x="180" y="214">-40</text>
+          <text class="axis-value" x="300" y="214">-20</text>
+          <text class="axis-value" x="420" y="214">-10</text>
+          <text class="axis-value" x="515" y="214">0</text>
+
+          <!-- Axis values - Y -->
+          <text class="axis-value" x="48" y="204" text-anchor="end">-60</text>
+          <text class="axis-value" x="48" y="145" text-anchor="end">-40</text>
+          <text class="axis-value" x="48" y="104" text-anchor="end">-20</text>
+          <text class="axis-value" x="48" y="62" text-anchor="end">-10</text>
+          <text class="axis-value" x="48" y="35" text-anchor="end">0</text>
+        </svg>
+
+        <!-- Mini meters -->
+        <div class="meters-overlay">
+          <div class="meter-mini">
+            <span class="meter-mini-label">IN</span>
+            <div class="meter-mini-bar">
+              <div class="meter-mini-fill" id="inputMeter"></div>
+            </div>
+          </div>
+          <div class="meter-mini">
+            <span class="meter-mini-label">GR</span>
+            <div class="meter-mini-bar">
+              <div class="meter-mini-fill gr" id="grMeter"></div>
+            </div>
+          </div>
+          <div class="meter-mini">
+            <span class="meter-mini-label">OUT</span>
+            <div class="meter-mini-bar">
+              <div class="meter-mini-fill" id="outputMeter"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAT Knob Section -->
+      <div class="fat-section">
+        <div class="fat-label">F<span class="fat-letter-a">A</span>T</div>
+        <div class="fat-knob" id="fatKnob" data-param="fat">
+          <svg class="knob-arc-svg" viewBox="0 0 100 100">
+            <defs>
+              <filter id="glowArcOrange" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="blur1"/>
+                <feGaussianBlur stdDeviation="6" result="blur2"/>
+                <feMerge>
+                  <feMergeNode in="blur2"/>
+                  <feMergeNode in="blur1"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <circle class="knob-arc-bg" cx="50" cy="50" r="46" />
+            <circle class="knob-arc-progress" id="fatArc" cx="50" cy="50" r="46" filter="url(#glowArcOrange)" />
+          </svg>
+          <div class="knob-body fat-body">
+            <div class="knob-indicator fat-indicator" id="fatIndicator"></div>
+          </div>
+        </div>
+        <div class="fat-value"><span id="fatValue">50</span><span class="fat-value-unit">%</span></div>
+      </div>
+    </div>
+
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <!-- Threshold - ORANGE GLOW -->
+      <div class="control graph-linked">
+        <div class="control-label">THRESHOLD</div>
+        <div class="knob" id="thresholdKnob" data-param="threshold">
+          <svg class="knob-arc-svg" viewBox="0 0 100 100">
+            <defs>
+              <filter id="glowOrangeSmall" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="blur1"/>
+                <feGaussianBlur stdDeviation="4" result="blur2"/>
+                <feMerge>
+                  <feMergeNode in="blur2"/>
+                  <feMergeNode in="blur1"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <circle class="knob-arc-bg" cx="50" cy="50" r="46" />
+            <circle class="knob-arc-progress linked" id="thresholdArc" cx="50" cy="50" r="46" filter="url(#glowOrangeSmall)" />
+          </svg>
+          <div class="knob-body">
+            <div class="knob-indicator linked" id="thresholdIndicator"></div>
+          </div>
+        </div>
+        <div class="control-value" id="thresholdValue">-20 dB</div>
+      </div>
+
+      <!-- Ratio - ORANGE GLOW -->
+      <div class="control graph-linked">
+        <div class="control-label">RATIO</div>
+        <div class="knob" id="ratioKnob" data-param="ratio">
+          <svg class="knob-arc-svg" viewBox="0 0 100 100">
+            <circle class="knob-arc-bg" cx="50" cy="50" r="46" />
+            <circle class="knob-arc-progress linked" id="ratioArc" cx="50" cy="50" r="46" filter="url(#glowOrangeSmall)" />
+          </svg>
+          <div class="knob-body">
+            <div class="knob-indicator linked" id="ratioIndicator"></div>
+          </div>
+        </div>
+        <div class="control-value" id="ratioValue">4:1</div>
+      </div>
+
+      <!-- Attack - ORANGE -->
+      <div class="control graph-linked">
+        <div class="control-label">ATTACK</div>
+        <div class="knob" id="attackKnob" data-param="attack">
+          <svg class="knob-arc-svg" viewBox="0 0 100 100">
+            <circle class="knob-arc-bg" cx="50" cy="50" r="46" />
+            <circle class="knob-arc-progress linked" id="attackArc" cx="50" cy="50" r="46" filter="url(#glowOrangeSmall)" />
+          </svg>
+          <div class="knob-body">
+            <div class="knob-indicator linked" id="attackIndicator"></div>
+          </div>
+        </div>
+        <div class="control-value" id="attackValue">10 ms</div>
+      </div>
+
+      <!-- Release - ORANGE -->
+      <div class="control graph-linked">
+        <div class="control-label">RELEASE</div>
+        <div class="knob" id="releaseKnob" data-param="release">
+          <svg class="knob-arc-svg" viewBox="0 0 100 100">
+            <circle class="knob-arc-bg" cx="50" cy="50" r="46" />
+            <circle class="knob-arc-progress linked" id="releaseArc" cx="50" cy="50" r="46" filter="url(#glowOrangeSmall)" />
+          </svg>
+          <div class="knob-body">
+            <div class="knob-indicator linked" id="releaseIndicator"></div>
+          </div>
+        </div>
+        <div class="control-value" id="releaseValue">100 ms</div>
+      </div>
+
+      <!-- Output - ORANGE -->
+      <div class="control graph-linked">
+        <div class="control-label">OUTPUT</div>
+        <div class="knob" id="outputKnob" data-param="output">
+          <svg class="knob-arc-svg" viewBox="0 0 100 100">
+            <circle class="knob-arc-bg" cx="50" cy="50" r="46" />
+            <circle class="knob-arc-progress linked" id="outputArc" cx="50" cy="50" r="46" filter="url(#glowOrangeSmall)" />
+          </svg>
+          <div class="knob-body">
+            <div class="knob-indicator linked" id="outputIndicator"></div>
+          </div>
+        </div>
+        <div class="control-value" id="outputValue">0 dB</div>
+      </div>
+
+      <!-- Mix - ORANGE -->
+      <div class="control graph-linked">
+        <div class="control-label">MIX</div>
+        <div class="knob" id="mixKnob" data-param="mix">
+          <svg class="knob-arc-svg" viewBox="0 0 100 100">
+            <circle class="knob-arc-bg" cx="50" cy="50" r="46" />
+            <circle class="knob-arc-progress linked" id="mixArc" cx="50" cy="50" r="46" filter="url(#glowOrangeSmall)" />
+          </svg>
+          <div class="knob-body">
+            <div class="knob-indicator linked" id="mixIndicator"></div>
+          </div>
+        </div>
+        <div class="control-value" id="mixValue">100%</div>
+      </div>
+    </div>
+
+    </div>
+
+    <!-- Credits Overlay -->
+    <div class="credits-overlay" id="creditsOverlay">
+      <div class="credits-backdrop"></div>
+      <div class="credits-content">
+        <button class="credits-close" id="creditsClose">✕</button>
+        <div class="credits-header">
+          <div class="credits-logo">FATPRESSOR</div>
+          <div class="credits-version">Version 0.2.0</div>
+        </div>
+        <div class="credits-body">
+          <div class="credits-section">
+            <div class="credits-label">Developed by</div>
+            <div class="credits-value">Mike Gazzaruso (Sylfo)</div>
+          </div>
+          <div class="credits-section">
+            <div class="credits-label">Thanks to</div>
+            <div class="credits-value">'kwaidan' for testing</div>
+          </div>
+          <div class="credits-section">
+            <div class="credits-label">Built with</div>
+            <a href="https://github.com/mikegazzaruso/VYBR" target="_blank" class="credits-tech credits-link">VYBR Framework</a>
+          </div>
+        </div>
+        <div class="credits-footer">
+          &copy; 2026 Sylfo. All rights reserved.
+        </div>
+      </div>
+    </div>
+
+  <!-- CRITICAL: Only load modules at END of body -->
+  <script type="module" src="/js/juce/index.js"></script>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

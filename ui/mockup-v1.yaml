@@ -1,0 +1,214 @@
+canvas:
+  width: 800
+  height: 600
+  background: "#0a0a0a"
+
+aesthetic:
+  style: modern_minimal
+  primary_color: "#ff9500"      # Warm amber for FAT
+  secondary_color: "#2a2a2a"    # Dark gray panels
+  accent_color: "#ffb84d"       # Lighter amber glow
+  text_color: "#e0e0e0"         # Light gray text
+  meter_color: "#4a9eff"        # Cool blue for meters
+  gr_color: "#ff5555"           # Red for gain reduction
+  font_family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+  font_weight: 300              # Light weight for modern look
+
+header:
+  height: 50
+  logo: "FatPressor"
+  logo_size: 24
+  logo_weight: 200
+  company: "Sylfo"
+  company_size: 11
+  company_opacity: 0.5
+
+layout:
+  sections:
+    - id: header
+      position: [0, 0]
+      size: [800, 50]
+
+    - id: meters_top
+      position: [0, 50]
+      size: [800, 140]
+      background: "#0a0a0a"
+
+    - id: fat_section
+      position: [0, 190]
+      size: [800, 240]
+      background: "#121212"
+
+    - id: controls_section
+      position: [0, 430]
+      size: [800, 140]
+      background: "#0a0a0a"
+
+    - id: footer
+      position: [0, 570]
+      size: [800, 30]
+
+metering:
+  - id: input_level
+    type: vu_meter
+    position: [60, 70]
+    size: [40, 100]
+    orientation: vertical
+    label: "INPUT"
+    label_position: above
+    range: [-60, 12]
+    segments: 20
+    colors:
+      safe: "#4a9eff"
+      warning: "#ffb84d"
+      danger: "#ff5555"
+
+  - id: gain_reduction
+    type: gr_meter
+    position: [380, 70]
+    size: [240, 20]
+    orientation: horizontal
+    label: "GR"
+    label_position: above
+    range: [0, 24]
+    segments: 24
+    colors:
+      active: "#ff5555"
+      inactive: "#1a1a1a"
+
+  - id: output_level
+    type: vu_meter
+    position: [700, 70]
+    size: [40, 100]
+    orientation: vertical
+    label: "OUTPUT"
+    label_position: above
+    range: [-60, 12]
+    segments: 20
+    colors:
+      safe: "#4a9eff"
+      warning: "#ffb84d"
+      danger: "#ff5555"
+
+controls:
+  # Hero FAT knob - centered, large
+  - id: fat
+    type: knob
+    position: [300, 220]
+    size: 160
+    label: "FAT"
+    label_size: 32
+    label_weight: 100
+    label_position: above
+    show_value: true
+    value_size: 48
+    value_weight: 200
+    value_suffix: "%"
+    range: [0, 100]
+    default: 50
+    color: "#ff9500"
+    glow: true
+    glow_color: "#ff9500"
+    glow_intensity: 0.6
+    track_width: 6
+    visual_priority: primary
+
+  # Standard controls - bottom row
+  - id: threshold
+    type: knob
+    position: [70, 460]
+    size: 70
+    label: "THRESHOLD"
+    label_size: 10
+    label_position: above
+    show_value: true
+    value_size: 14
+    value_suffix: "dB"
+    range: [-60, 0]
+    default: -20
+    color: "#666666"
+    track_width: 3
+
+  - id: ratio
+    type: knob
+    position: [190, 460]
+    size: 70
+    label: "RATIO"
+    label_size: 10
+    label_position: above
+    show_value: true
+    value_size: 14
+    value_suffix: ":1"
+    range: [2, 10]
+    default: 4
+    color: "#666666"
+    track_width: 3
+
+  - id: attack
+    type: knob
+    position: [310, 460]
+    size: 70
+    label: "ATTACK"
+    label_size: 10
+    label_position: above
+    show_value: true
+    value_size: 14
+    value_suffix: "ms"
+    range: [0.1, 100]
+    default: 10
+    color: "#666666"
+    track_width: 3
+
+  - id: release
+    type: knob
+    position: [430, 460]
+    size: 70
+    label: "RELEASE"
+    label_size: 10
+    label_position: above
+    show_value: true
+    value_size: 14
+    value_suffix: "ms"
+    range: [50, 1000]
+    default: 400
+    color: "#666666"
+    track_width: 3
+
+  - id: output
+    type: knob
+    position: [550, 460]
+    size: 70
+    label: "OUTPUT"
+    label_size: 10
+    label_position: above
+    show_value: true
+    value_size: 14
+    value_suffix: "dB"
+    range: [-24, 24]
+    default: 0
+    color: "#666666"
+    track_width: 3
+
+  - id: mix
+    type: knob
+    position: [670, 460]
+    size: 70
+    label: "MIX"
+    label_size: 10
+    label_position: above
+    show_value: true
+    value_size: 14
+    value_suffix: "%"
+    range: [0, 100]
+    default: 100
+    color: "#666666"
+    track_width: 3
+
+footer:
+  height: 30
+  elements:
+    - type: text
+      content: "© 2026 Sylfo"
+      position: center
+      size: 10
+      opacity: 0.4

@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FatPressor - UI Mockup v3</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .plugin-container {
+      width: 800px;
+      height: 500px;
+      background: #0a0a0a;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==================== HEADER ==================== */
+    .header {
+      height: 50px;
+      background: linear-gradient(180deg, #151515 0%, #0a0a0a 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 200;
+      color: #e0e0e0;
+      letter-spacing: 4px;
+    }
+
+    /* Preset System */
+    .preset-system {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .preset-nav {
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      transition: all 0.15s ease;
+    }
+
+    .preset-nav:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .preset-name {
+      min-width: 180px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-name:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .preset-name-text {
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 0.5px;
+    }
+
+    .preset-save {
+      width: 28px;
+      height: 24px;
+      background: rgba(255, 149, 0, 0.1);
+      border: 1px solid rgba(255, 149, 0, 0.3);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255, 149, 0, 0.7);
+      font-size: 10px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .preset-save:hover {
+      background: rgba(255, 149, 0, 0.2);
+      color: #ff9500;
+    }
+
+    .company {
+      font-size: 10px;
+      font-weight: 300;
+      color: rgba(224, 224, 224, 0.4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ==================== MAIN SECTION ==================== */
+    .main-section {
+      flex: 1;
+      display: flex;
+      padding: 20px;
+      gap: 20px;
+      background: #0a0a0a;
+    }
+
+    /* Compression Graph - Wide */
+    .graph-container {
+      flex: 1;
+      background: #080808;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      position: relative;
+      overflow: hidden;
+      min-height: 260px;
+    }
+
+    .graph-header {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      font-size: 10px;
+      font-weight: 300;
+      color: rgba(224, 224, 224, 0.4);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .graph-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Graph grid lines */
+    .grid-line {
+      stroke: rgba(255, 255, 255, 0.04);
+      stroke-width: 1;
+    }
+
+    /* 1:1 reference line */
+    .reference-line {
+      stroke: rgba(255, 255, 255, 0.12);
+      stroke-width: 1;
+      stroke-dasharray: 4, 4;
+    }
+
+    /* Compression curve */
+    .compression-curve {
+      fill: none;
+      stroke: #ff9500;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 8px rgba(255, 149, 0, 0.4));
+    }
+
+    /* Fill under curve */
+    .compression-fill {
+      fill: url(#curveGradient);
+      opacity: 0.15;
+    }
+
+    /* Threshold point */
+    .threshold-point {
+      fill: #ff9500;
+      cursor: grab;
+      filter: drop-shadow(0 0 10px rgba(255, 149, 0, 0.8));
+      transition: r 0.15s ease;
+    }
+
+    .threshold-point:hover {
+      r: 12;
+    }
+
+    .threshold-point:active {
+      cursor: grabbing;
+    }
+
+    /* Threshold lines */
+    .threshold-line-v {
+      stroke: rgba(255, 149, 0, 0.25);
+      stroke-width: 1;
+      stroke-dasharray: 4, 4;
+    }
+
+    .threshold-line-h {
+      stroke: rgba(255, 149, 0, 0.25);
+      stroke-width: 1;
+      stroke-dasharray: 4, 4;
+    }
+
+    /* Axis labels */
+    .axis-label {
+      font-size: 9px;
+      fill: rgba(224, 224, 224, 0.35);
+      font-family: system-ui, sans-serif;
+    }
+
+    .axis-value {
+      font-size: 8px;
+      fill: rgba(224, 224, 224, 0.25);
+      font-family: system-ui, sans-serif;
+    }
+
+    /* Graph info overlay */
+    .graph-info {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .graph-info-item {
+      font-size: 11px;
+      color: rgba(224, 224, 224, 0.5);
+      letter-spacing: 0.5px;
+    }
+
+    .graph-info-value {
+      color: #ff9500;
+      font-weight: 500;
+    }
+
+    /* Meters inside graph */
+    .meters-overlay {
+      position: absolute;
+      bottom: 12px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .meter-mini {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meter-mini-label {
+      font-size: 8px;
+      color: rgba(224, 224, 224, 0.4);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .meter-mini-bar {
+      width: 60px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .meter-mini-fill {
+      height: 100%;
+      background: linear-gradient(to right, #4a9eff, #4a9eff 70%, #ffb84d 85%, #ff5555);
+      border-radius: 3px;
+      width: 65%;
+      transition: width 0.1s ease;
+    }
+
+    .meter-mini-fill.gr {
+      background: linear-gradient(to right, #ff5555, #ff8888);
+      width: 35%;
+    }
+
+    /* ==================== FAT KNOB SECTION ==================== */
+    .fat-section {
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(255, 149, 0, 0.02);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 149, 0, 0.08);
+      padding: 20px 10px;
+    }
+
+    .fat-label {
+      font-size: 18px;
+      font-weight: 100;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+
+    .fat-knob {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .fat-knob-bg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #2a2a2a, #151515);
+      box-shadow:
+        0 6px 24px rgba(0, 0, 0, 0.6),
+        inset 0 2px 6px rgba(255, 255, 255, 0.04),
+        0 0 40px rgba(255, 149, 0, 0.2);
+      position: relative;
+      transform: rotate(135deg);
+    }
+
+    .fat-knob-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 149, 0, 0.15);
+    }
+
+    .fat-knob-track {
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+    }
+
+    .fat-knob-progress {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #ff9500 180deg,
+        transparent 180deg
+      );
+      mask: radial-gradient(circle, transparent 55%, black 55%);
+      -webkit-mask: radial-gradient(circle, transparent 55%, black 55%);
+    }
+
+    .fat-knob-indicator {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 3px;
+      height: 20px;
+      background: #ff9500;
+      transform: translateX(-50%) rotate(90deg);
+      transform-origin: center 44px;
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(255, 149, 0, 0.9);
+    }
+
+    .fat-value {
+      font-size: 28px;
+      font-weight: 200;
+      color: #ff9500;
+      letter-spacing: 1px;
+      text-shadow: 0 0 20px rgba(255, 149, 0, 0.4);
+    }
+
+    .fat-value-unit {
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    /* ==================== CONTROLS SECTION ==================== */
+    .controls-section {
+      height: 130px;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      padding: 0 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-label {
+      font-size: 9px;
+      font-weight: 400;
+      color: rgba(224, 224, 224, 0.5);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .knob {
+      width: 56px;
+      height: 56px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .knob-bg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #252525, #141414);
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        inset 0 1px 3px rgba(255, 255, 255, 0.04);
+      position: relative;
+      transform: rotate(135deg);
+    }
+
+    .knob-track {
+      position: absolute;
+      inset: 5px;
+      border-radius: 50%;
+    }
+
+    .knob-progress {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #555555 135deg,
+        transparent 135deg
+      );
+      mask: radial-gradient(circle, transparent 55%, black 55%);
+      -webkit-mask: radial-gradient(circle, transparent 55%, black 55%);
+    }
+
+    .knob-indicator {
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      width: 2px;
+      height: 12px;
+      background: #888888;
+      transform: translateX(-50%) rotate(67.5deg);
+      transform-origin: center 28px;
+      border-radius: 1px;
+    }
+
+    .control-value {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.6);
+      letter-spacing: 0.3px;
+    }
+
+    /* Graph-linked controls highlight */
+    .control.graph-linked .knob-progress {
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(255, 149, 0, 0.5) 135deg,
+        transparent 135deg
+      );
+    }
+
+    .control.graph-linked .knob-indicator {
+      background: #ff9500;
+    }
+
+    .control.graph-linked .control-value {
+      color: rgba(255, 149, 0, 0.8);
+    }
+
+    .control.graph-linked .control-label {
+      color: rgba(255, 149, 0, 0.6);
+    }
+
+    /* ==================== FOOTER ==================== */
+    .footer {
+      height: 24px;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .footer-text {
+      font-size: 9px;
+      font-weight: 300;
+      color: rgba(224, 224, 224, 0.3);
+      letter-spacing: 1px;
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .meter-mini-fill {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* Hover effects */
+    .fat-knob:hover {
+      transform: scale(1.03);
+      transition: transform 0.2s ease;
+    }
+
+    .knob:hover {
+      transform: scale(1.08);
+      transition: transform 0.15s ease;
+    }
+
+    .graph-container:hover {
+      border-color: rgba(255, 149, 0, 0.2);
+      transition: border-color 0.2s ease;
+    }
+
+    /* Info box */
+    .info-box {
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background: rgba(20, 20, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 9px;
+      color: rgba(224, 224, 224, 0.6);
+      line-height: 1.5;
+      max-width: 150px;
+      z-index: 10;
+    }
+
+    .info-title {
+      font-weight: 500;
+      color: #ff9500;
+      margin-bottom: 3px;
+      letter-spacing: 1px;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="plugin-container">
+    <!-- Info Box -->
+    <div class="info-box">
+      <div class="info-title">MOCKUP v3</div>
+      Wide graph + FAT on right. Drag threshold point to adjust.
+    </div>
+
+    <!-- Header with Preset System -->
+    <div class="header">
+      <div class="logo">FATPRESSOR</div>
+
+      <div class="preset-system">
+        <div class="preset-nav">◀</div>
+        <div class="preset-name">
+          <span class="preset-name-text">Default</span>
+        </div>
+        <div class="preset-nav">▶</div>
+        <div class="preset-save">+</div>
+      </div>
+
+      <div class="company">SYLFO</div>
+    </div>
+
+    <!-- Main Section: Wide Graph + FAT -->
+    <div class="main-section">
+      <!-- Compression Graph - Wide -->
+      <div class="graph-container">
+        <div class="graph-header">COMPRESSION CURVE</div>
+
+        <div class="graph-info">
+          <div class="graph-info-item">THR <span class="graph-info-value">-20dB</span></div>
+          <div class="graph-info-item">RAT <span class="graph-info-value">4:1</span></div>
+          <div class="graph-info-item">GR <span class="graph-info-value">-6.2dB</span></div>
+        </div>
+
+        <svg class="graph-svg" viewBox="0 0 560 240" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="curveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#ff9500;stop-opacity:0.3" />
+              <stop offset="100%" style="stop-color:#ff9500;stop-opacity:0" />
+            </linearGradient>
+          </defs>
+
+          <!-- Grid lines - vertical -->
+          <line class="grid-line" x1="60" y1="30" x2="60" y2="200" />
+          <line class="grid-line" x1="140" y1="30" x2="140" y2="200" />
+          <line class="grid-line" x1="220" y1="30" x2="220" y2="200" />
+          <line class="grid-line" x1="300" y1="30" x2="300" y2="200" />
+          <line class="grid-line" x1="380" y1="30" x2="380" y2="200" />
+          <line class="grid-line" x1="460" y1="30" x2="460" y2="200" />
+
+          <!-- Grid lines - horizontal -->
+          <line class="grid-line" x1="60" y1="58" x2="520" y2="58" />
+          <line class="grid-line" x1="60" y1="100" x2="520" y2="100" />
+          <line class="grid-line" x1="60" y1="142" x2="520" y2="142" />
+          <line class="grid-line" x1="60" y1="200" x2="520" y2="200" />
+
+          <!-- 1:1 reference line -->
+          <line class="reference-line" x1="60" y1="200" x2="520" y2="30" />
+
+          <!-- Threshold lines -->
+          <line class="threshold-line-v" x1="340" y1="30" x2="340" y2="200" />
+          <line class="threshold-line-h" x1="60" y1="72" x2="520" y2="72" />
+
+          <!-- Fill under compression curve -->
+          <path class="compression-fill"
+                d="M 60 200
+                   L 300 72
+                   Q 340 50, 380 46
+                   L 520 38
+                   L 520 200
+                   Z" />
+
+          <!-- Compression curve -->
+          <path class="compression-curve"
+                d="M 60 200
+                   L 300 72
+                   Q 340 50, 380 46
+                   L 520 38" />
+
+          <!-- Threshold point (draggable) -->
+          <circle class="threshold-point" cx="340" cy="54" r="9" />
+
+          <!-- Axis labels -->
+          <text class="axis-label" x="290" y="218" text-anchor="middle">INPUT (dB)</text>
+          <text class="axis-label" x="30" y="115" text-anchor="middle" transform="rotate(-90, 30, 115)">OUTPUT (dB)</text>
+
+          <!-- Axis values - X -->
+          <text class="axis-value" x="60" y="214">-60</text>
+          <text class="axis-value" x="180" y="214">-40</text>
+          <text class="axis-value" x="300" y="214">-20</text>
+          <text class="axis-value" x="420" y="214">-10</text>
+          <text class="axis-value" x="515" y="214">0</text>
+
+          <!-- Axis values - Y -->
+          <text class="axis-value" x="48" y="204" text-anchor="end">-60</text>
+          <text class="axis-value" x="48" y="145" text-anchor="end">-40</text>
+          <text class="axis-value" x="48" y="104" text-anchor="end">-20</text>
+          <text class="axis-value" x="48" y="62" text-anchor="end">-10</text>
+          <text class="axis-value" x="48" y="35" text-anchor="end">0</text>
+        </svg>
+
+        <!-- Mini meters -->
+        <div class="meters-overlay">
+          <div class="meter-mini">
+            <span class="meter-mini-label">IN</span>
+            <div class="meter-mini-bar">
+              <div class="meter-mini-fill" id="inputMeter"></div>
+            </div>
+          </div>
+          <div class="meter-mini">
+            <span class="meter-mini-label">GR</span>
+            <div class="meter-mini-bar">
+              <div class="meter-mini-fill gr" id="grMeter"></div>
+            </div>
+          </div>
+          <div class="meter-mini">
+            <span class="meter-mini-label">OUT</span>
+            <div class="meter-mini-bar">
+              <div class="meter-mini-fill" id="outputMeter"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAT Knob Section -->
+      <div class="fat-section">
+        <div class="fat-label">FAT</div>
+        <div class="fat-knob">
+          <div class="fat-knob-ring"></div>
+          <div class="fat-knob-bg">
+            <div class="fat-knob-track">
+              <div class="fat-knob-progress"></div>
+            </div>
+            <div class="fat-knob-indicator"></div>
+          </div>
+        </div>
+        <div class="fat-value">50<span class="fat-value-unit">%</span></div>
+      </div>
+    </div>
+
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <!-- Threshold -->
+      <div class="control graph-linked">
+        <div class="control-label">THRESHOLD</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">-20 dB</div>
+      </div>
+
+      <!-- Ratio -->
+      <div class="control graph-linked">
+        <div class="control-label">RATIO</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">4:1</div>
+      </div>
+
+      <!-- Attack -->
+      <div class="control">
+        <div class="control-label">ATTACK</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">10 ms</div>
+      </div>
+
+      <!-- Release -->
+      <div class="control">
+        <div class="control-label">RELEASE</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">400 ms</div>
+      </div>
+
+      <!-- Output -->
+      <div class="control">
+        <div class="control-label">OUTPUT</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">0 dB</div>
+      </div>
+
+      <!-- Mix -->
+      <div class="control">
+        <div class="control-label">MIX</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">100%</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-text">© 2026 SYLFO</div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Animate meters
+      const inputMeter = document.getElementById('inputMeter');
+      const grMeter = document.getElementById('grMeter');
+      const outputMeter = document.getElementById('outputMeter');
+
+      setInterval(() => {
+        inputMeter.style.width = (55 + Math.random() * 30) + '%';
+        grMeter.style.width = (20 + Math.random() * 35) + '%';
+        outputMeter.style.width = (50 + Math.random() * 35) + '%';
+      }, 800);
+
+      // Threshold point drag
+      const thresholdPoint = document.querySelector('.threshold-point');
+      let isDragging = false;
+
+      thresholdPoint.addEventListener('mousedown', () => {
+        isDragging = true;
+        thresholdPoint.setAttribute('r', '12');
+        thresholdPoint.style.filter = 'drop-shadow(0 0 15px rgba(255, 149, 0, 1))';
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          thresholdPoint.setAttribute('r', '9');
+          thresholdPoint.style.filter = 'drop-shadow(0 0 10px rgba(255, 149, 0, 0.8))';
+        }
+      });
+
+      // Knob hover effects
+      const knobs = document.querySelectorAll('.knob, .fat-knob');
+      knobs.forEach(knob => {
+        knob.addEventListener('mouseenter', () => {
+          knob.style.transform = knob.classList.contains('fat-knob') ? 'scale(1.03)' : 'scale(1.08)';
+          knob.style.transition = 'transform 0.15s ease';
+        });
+        knob.addEventListener('mouseleave', () => {
+          knob.style.transform = 'scale(1)';
+        });
+      });
+
+      // Preset hover
+      const presetName = document.querySelector('.preset-name');
+      presetName.addEventListener('click', () => {
+        alert('Preset browser would open here');
+      });
+    });
+  </script>
+</body>
+</html>

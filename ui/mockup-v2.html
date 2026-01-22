@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FatPressor - UI Mockup v2</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .plugin-container {
+      width: 800px;
+      height: 600px;
+      background: #0a0a0a;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      height: 50px;
+      background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 200;
+      color: #e0e0e0;
+      letter-spacing: 3px;
+    }
+
+    .company {
+      font-size: 11px;
+      font-weight: 300;
+      color: rgba(224, 224, 224, 0.5);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Meters Section */
+    .meters-section {
+      height: 100px;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .meter-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meter-label {
+      font-size: 9px;
+      font-weight: 300;
+      color: rgba(224, 224, 224, 0.6);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .vu-meter {
+      width: 30px;
+      height: 70px;
+      background: #1a1a1a;
+      border-radius: 3px;
+      padding: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vu-meter-fill {
+      position: absolute;
+      bottom: 3px;
+      left: 3px;
+      right: 3px;
+      height: 65%;
+      background: linear-gradient(to top,
+        #4a9eff 0%,
+        #4a9eff 70%,
+        #ffb84d 85%,
+        #ff5555 100%);
+      border-radius: 2px;
+      transition: height 0.1s ease-out;
+    }
+
+    .gr-meter-wrapper {
+      flex: 1;
+      max-width: 300px;
+      margin: 0 30px;
+    }
+
+    .gr-meter {
+      width: 100%;
+      height: 16px;
+      background: #1a1a1a;
+      border-radius: 3px;
+      padding: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gr-meter-fill {
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      bottom: 3px;
+      width: 35%;
+      background: linear-gradient(to right, #ff5555, #ff8888);
+      border-radius: 2px;
+      transition: width 0.05s ease-out;
+    }
+
+    /* Main Section - Graph + FAT */
+    .main-section {
+      height: 280px;
+      background: #0d0d0d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      padding: 20px 40px;
+    }
+
+    /* Compression Graph */
+    .graph-container {
+      width: 320px;
+      height: 240px;
+      background: #0a0a0a;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .graph-header {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      font-size: 10px;
+      font-weight: 300;
+      color: rgba(224, 224, 224, 0.5);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .graph-canvas {
+      width: 100%;
+      height: 100%;
+      padding: 30px 20px 20px 30px;
+    }
+
+    .graph-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Graph grid lines */
+    .grid-line {
+      stroke: rgba(255, 255, 255, 0.06);
+      stroke-width: 1;
+    }
+
+    /* 1:1 reference line */
+    .reference-line {
+      stroke: rgba(255, 255, 255, 0.15);
+      stroke-width: 1;
+      stroke-dasharray: 4, 4;
+    }
+
+    /* Compression curve */
+    .compression-curve {
+      fill: none;
+      stroke: #ff9500;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 6px rgba(255, 149, 0, 0.5));
+    }
+
+    /* Threshold point */
+    .threshold-point {
+      fill: #ff9500;
+      cursor: pointer;
+      filter: drop-shadow(0 0 8px rgba(255, 149, 0, 0.8));
+      transition: r 0.15s ease;
+    }
+
+    .threshold-point:hover {
+      r: 10;
+    }
+
+    /* Threshold line */
+    .threshold-line {
+      stroke: rgba(255, 149, 0, 0.3);
+      stroke-width: 1;
+      stroke-dasharray: 3, 3;
+    }
+
+    /* Axis labels */
+    .axis-label {
+      font-size: 8px;
+      fill: rgba(224, 224, 224, 0.4);
+      font-family: system-ui, sans-serif;
+    }
+
+    .axis-value {
+      font-size: 7px;
+      fill: rgba(224, 224, 224, 0.3);
+      font-family: system-ui, sans-serif;
+    }
+
+    /* Graph info */
+    .graph-info {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .graph-info-item {
+      font-size: 10px;
+      color: rgba(224, 224, 224, 0.6);
+    }
+
+    .graph-info-value {
+      color: #ff9500;
+      font-weight: 500;
+    }
+
+    /* FAT Control - Smaller */
+    .fat-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .fat-label {
+      font-size: 24px;
+      font-weight: 100;
+      color: #e0e0e0;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+
+    .fat-knob {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .fat-knob-bg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #2a2a2a, #1a1a1a);
+      box-shadow:
+        0 6px 24px rgba(0, 0, 0, 0.6),
+        inset 0 2px 6px rgba(255, 255, 255, 0.05),
+        0 0 30px rgba(255, 149, 0, 0.25);
+      position: relative;
+      transform: rotate(135deg);
+    }
+
+    .fat-knob-track {
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+    }
+
+    .fat-knob-progress {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #ff9500 180deg,
+        transparent 180deg
+      );
+      mask: radial-gradient(circle, transparent 58%, black 58%);
+      -webkit-mask: radial-gradient(circle, transparent 58%, black 58%);
+    }
+
+    .fat-knob-indicator {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 3px;
+      height: 22px;
+      background: #ff9500;
+      transform: translateX(-50%) rotate(90deg);
+      transform-origin: center 54px;
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(255, 149, 0, 0.8);
+    }
+
+    .fat-value {
+      font-size: 36px;
+      font-weight: 200;
+      color: #ff9500;
+      letter-spacing: 2px;
+      text-shadow: 0 0 16px rgba(255, 149, 0, 0.5);
+    }
+
+    .fat-value-unit {
+      font-size: 18px;
+      opacity: 0.7;
+    }
+
+    /* Controls Section */
+    .controls-section {
+      height: 140px;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-label {
+      font-size: 10px;
+      font-weight: 300;
+      color: rgba(224, 224, 224, 0.6);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .knob {
+      width: 60px;
+      height: 60px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .knob-bg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #2a2a2a, #1a1a1a);
+      box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.5),
+        inset 0 2px 4px rgba(255, 255, 255, 0.05);
+      position: relative;
+      transform: rotate(135deg);
+    }
+
+    .knob-track {
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+    }
+
+    .knob-progress {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #666666 135deg,
+        transparent 135deg
+      );
+      mask: radial-gradient(circle, transparent 58%, black 58%);
+      -webkit-mask: radial-gradient(circle, transparent 58%, black 58%);
+    }
+
+    .knob-indicator {
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      width: 2px;
+      height: 14px;
+      background: #999999;
+      transform: translateX(-50%) rotate(67.5deg);
+      transform-origin: center 30px;
+      border-radius: 1px;
+    }
+
+    .control-value {
+      font-size: 12px;
+      font-weight: 400;
+      color: #999999;
+      letter-spacing: 0.5px;
+    }
+
+    /* Highlighted controls (threshold/ratio - also editable via graph) */
+    .control.graph-linked .control-label {
+      color: rgba(255, 149, 0, 0.7);
+    }
+
+    .control.graph-linked .knob-progress {
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(255, 149, 0, 0.6) 135deg,
+        transparent 135deg
+      );
+    }
+
+    .control.graph-linked .knob-indicator {
+      background: #ff9500;
+    }
+
+    .control.graph-linked .control-value {
+      color: rgba(255, 149, 0, 0.8);
+    }
+
+    /* Footer */
+    .footer {
+      height: 30px;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .footer-text {
+      font-size: 10px;
+      font-weight: 300;
+      color: rgba(224, 224, 224, 0.4);
+      letter-spacing: 1px;
+    }
+
+    /* Animation for meters */
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+
+    .vu-meter-fill {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .gr-meter-fill {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Info box */
+    .info-box {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 10px;
+      color: rgba(224, 224, 224, 0.7);
+      line-height: 1.5;
+      max-width: 180px;
+      z-index: 10;
+    }
+
+    .info-title {
+      font-weight: 500;
+      color: #ff9500;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+
+    /* Drag hint on graph */
+    .drag-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 12px;
+      font-size: 8px;
+      color: rgba(255, 149, 0, 0.5);
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="plugin-container">
+    <!-- Info Box -->
+    <div class="info-box">
+      <div class="info-title">MOCKUP v2</div>
+      Compression graph is interactive. Drag the threshold point or adjust the curve slope for ratio.
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">FATPRESSOR</div>
+      <div class="company">SYLFO</div>
+    </div>
+
+    <!-- Meters Section -->
+    <div class="meters-section">
+      <!-- Input Meter -->
+      <div class="meter-wrapper">
+        <div class="meter-label">INPUT</div>
+        <div class="vu-meter">
+          <div class="vu-meter-fill"></div>
+        </div>
+      </div>
+
+      <!-- GR Meter -->
+      <div class="gr-meter-wrapper">
+        <div class="meter-label">GR</div>
+        <div class="gr-meter">
+          <div class="gr-meter-fill"></div>
+        </div>
+      </div>
+
+      <!-- Output Meter -->
+      <div class="meter-wrapper">
+        <div class="meter-label">OUTPUT</div>
+        <div class="vu-meter">
+          <div class="vu-meter-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Section: Graph + FAT -->
+    <div class="main-section">
+      <!-- Compression Graph -->
+      <div class="graph-container">
+        <div class="graph-header">COMPRESSION</div>
+        <div class="drag-hint">DRAG TO ADJUST</div>
+
+        <svg class="graph-svg" viewBox="0 0 270 190">
+          <!-- Grid lines -->
+          <line class="grid-line" x1="30" y1="30" x2="30" y2="170" />
+          <line class="grid-line" x1="90" y1="30" x2="90" y2="170" />
+          <line class="grid-line" x1="150" y1="30" x2="150" y2="170" />
+          <line class="grid-line" x1="210" y1="30" x2="210" y2="170" />
+          <line class="grid-line" x1="30" y1="50" x2="250" y2="50" />
+          <line class="grid-line" x1="30" y1="90" x2="250" y2="90" />
+          <line class="grid-line" x1="30" y1="130" x2="250" y2="130" />
+          <line class="grid-line" x1="30" y1="170" x2="250" y2="170" />
+
+          <!-- 1:1 reference line (diagonal) -->
+          <line class="reference-line" x1="30" y1="170" x2="250" y2="30" />
+
+          <!-- Threshold vertical line -->
+          <line class="threshold-line" x1="140" y1="30" x2="140" y2="170" />
+
+          <!-- Compression curve (soft knee) -->
+          <path class="compression-curve"
+                d="M 30 170
+                   L 120 80
+                   Q 140 60, 160 55
+                   L 250 40" />
+
+          <!-- Threshold point (draggable) -->
+          <circle class="threshold-point" cx="140" cy="60" r="8" />
+
+          <!-- Axis labels -->
+          <text class="axis-label" x="140" y="185" text-anchor="middle">INPUT</text>
+          <text class="axis-label" x="12" y="100" text-anchor="middle" transform="rotate(-90, 12, 100)">OUTPUT</text>
+
+          <!-- Axis values -->
+          <text class="axis-value" x="30" y="182">-60</text>
+          <text class="axis-value" x="140" y="182">-20</text>
+          <text class="axis-value" x="245" y="182">0</text>
+          <text class="axis-value" x="22" y="172">-60</text>
+          <text class="axis-value" x="22" y="52">0</text>
+        </svg>
+
+        <!-- Graph info -->
+        <div class="graph-info">
+          <div class="graph-info-item">THR: <span class="graph-info-value">-20dB</span></div>
+          <div class="graph-info-item">RAT: <span class="graph-info-value">4:1</span></div>
+        </div>
+      </div>
+
+      <!-- FAT Control -->
+      <div class="fat-control">
+        <div class="fat-label">FAT</div>
+        <div class="fat-knob">
+          <div class="fat-knob-bg">
+            <div class="fat-knob-track">
+              <div class="fat-knob-progress"></div>
+            </div>
+            <div class="fat-knob-indicator"></div>
+          </div>
+        </div>
+        <div class="fat-value">50<span class="fat-value-unit">%</span></div>
+      </div>
+    </div>
+
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <!-- Threshold (linked to graph) -->
+      <div class="control graph-linked">
+        <div class="control-label">THRESHOLD</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">-20 dB</div>
+      </div>
+
+      <!-- Ratio (linked to graph) -->
+      <div class="control graph-linked">
+        <div class="control-label">RATIO</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">4:1</div>
+      </div>
+
+      <!-- Attack -->
+      <div class="control">
+        <div class="control-label">ATTACK</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">10 ms</div>
+      </div>
+
+      <!-- Release -->
+      <div class="control">
+        <div class="control-label">RELEASE</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">400 ms</div>
+      </div>
+
+      <!-- Output -->
+      <div class="control">
+        <div class="control-label">OUTPUT</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">0 dB</div>
+      </div>
+
+      <!-- Mix -->
+      <div class="control">
+        <div class="control-label">MIX</div>
+        <div class="knob">
+          <div class="knob-bg">
+            <div class="knob-track">
+              <div class="knob-progress"></div>
+            </div>
+            <div class="knob-indicator"></div>
+          </div>
+        </div>
+        <div class="control-value">100%</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-text">© 2026 SYLFO</div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Animate meters
+      const vuFills = document.querySelectorAll('.vu-meter-fill');
+      const grFill = document.querySelector('.gr-meter-fill');
+
+      setInterval(() => {
+        vuFills.forEach(fill => {
+          const randomHeight = 50 + Math.random() * 30;
+          fill.style.height = randomHeight + '%';
+        });
+
+        const randomWidth = 20 + Math.random() * 40;
+        grFill.style.width = randomWidth + '%';
+      }, 1000);
+
+      // Fat knob hover effect
+      const fatKnob = document.querySelector('.fat-knob');
+      fatKnob.addEventListener('mouseenter', () => {
+        fatKnob.style.transform = 'scale(1.05)';
+        fatKnob.style.transition = 'transform 0.2s ease-out';
+      });
+
+      fatKnob.addEventListener('mouseleave', () => {
+        fatKnob.style.transform = 'scale(1)';
+      });
+
+      // Regular knobs hover
+      const knobs = document.querySelectorAll('.knob');
+      knobs.forEach(knob => {
+        knob.addEventListener('mouseenter', () => {
+          knob.style.transform = 'scale(1.1)';
+          knob.style.transition = 'transform 0.15s ease-out';
+        });
+
+        knob.addEventListener('mouseleave', () => {
+          knob.style.transform = 'scale(1)';
+        });
+      });
+
+      // Threshold point drag simulation
+      const thresholdPoint = document.querySelector('.threshold-point');
+      let isDragging = false;
+
+      thresholdPoint.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        thresholdPoint.style.r = '10';
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        thresholdPoint.style.r = '8';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          // Visual feedback only for mockup
+          thresholdPoint.style.filter = 'drop-shadow(0 0 12px rgba(255, 149, 0, 1))';
+        }
+      });
+
+      // Graph hover effect
+      const graphContainer = document.querySelector('.graph-container');
+      graphContainer.addEventListener('mouseenter', () => {
+        graphContainer.style.borderColor = 'rgba(255, 149, 0, 0.3)';
+        graphContainer.style.transition = 'border-color 0.2s ease';
+      });
+
+      graphContainer.addEventListener('mouseleave', () => {
+        graphContainer.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+      });
+    });
+  </script>
+</body>
+</html>

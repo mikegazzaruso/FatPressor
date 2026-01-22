@@ -1,0 +1,349 @@
+meta:
+  name: FatPressor
+  version: 0.2.0
+  type: effect
+  created: 2026-01-21
+  stage: verify
+  as_submodule: false
+
+company:
+  name: "Sylfo"
+  code: "Sylf"
+  id: "sylfo"
+
+concept:
+  vision: |
+    FatPressor is a tube-driven optical compressor that transforms thin, digital-sounding
+    sources into warm, harmonically-rich material. Unlike surgical dynamics processors,
+    FatPressor prioritizes vibe over precision — delivering the essential "butter and bread"
+    warmth of classic tube compression with a signature FAT control that goes from subtle
+    warmth to full saturation.
+  target: |
+    Mix engineers and producers seeking instant analog warmth without the learning curve.
+    Bedroom producers, beatmakers working on vocals and drums, and mix engineers who want
+    character compression that sounds good immediately. Beginner to intermediate skill level.
+  references:
+    - "Waves CLA-2A: Sweet saturation, two-stage release, smooth optical response"
+    - "UAD Tube-Tech CL 1B: Push-pull tube design, smooth even-order harmonics"
+    - "Arturia Comp TUBE-STA: Simple, forgiving, works on almost any input"
+    - "Plugin Alliance Shadow Hills: Dual-stage compression concept (simplified)"
+  differentiator: |
+    The signature FAT control — a single knob that simultaneously engages tube harmonics,
+    optical slow-down, and transformer coloration. At 100%, delivers full butter saturation
+    for obvious effect, not just subtle color. Modern, stunning UI that's clean and captivating
+    without skeuomorphic textures. Program-dependent intelligence with manual override via
+    Attack/Release controls.
+  controls:
+    - name: Threshold
+      description: When compression kicks in
+    - name: Ratio
+      description: Soft-knee compression, 2:1 to 10:1
+    - name: Attack
+      description: Manual attack time override
+    - name: Release
+      description: Manual release time override
+    - name: FAT
+      description: Tube harmonics + warmth + transformer saturation
+    - name: Output
+      description: Makeup gain
+    - name: Mix
+      description: Parallel blend for fatness without squash
+  ui_style: "Modern, minimal, clean typography, captivating visuals, no skeuomorphism"
+  cpu_priority: "Balanced — quality modeling with smart optimizations"
+
+struct:
+  dsp:
+    architecture: |
+      Input → InputGain → SidechainDetector → EnvelopeFollower → GainComputer
+                              ↓                                       ↓
+                       TubeSaturation (FAT) ────→ VCACompression ←────┘
+                              ↓
+                     TransformerColoration (FAT)
+                              ↓
+                        OutputGain → MixBlend → Output
+
+    latency: 0
+    oversampling: 2x  # On saturation stages only
+
+    components:
+      - name: SidechainDetector
+        type: hybrid
+        description: "70% RMS + 30% peak detection for optical response"
+
+      - name: EnvelopeFollower
+        type: optical
+        description: "Program-dependent timing with two-stage release"
+        two_stage_release:
+          fast_phase: "First 6dB recovery at 0.5x release time"
+          slow_phase: "Remaining recovery at 1.0x release time"
+
+      - name: GainComputer
+        type: soft_knee
+        description: "6dB fixed knee width (optical characteristic)"
+
+      - name: TubeSaturation
+        type: waveshaper
+        description: "Pre-compression tube harmonics (2nd, 4th, 6th)"
+        fat_behavior:
+          0_percent: "Bypass (clean)"
+          50_percent: "Subtle warmth (2nd harmonic at -40dB)"
+          100_percent: "Full butter (2nd harmonic at -18dB)"
+        transfer_function: "Asymmetric tanh with FAT-controlled drive (1x to 5x)"
+
+      - name: TransformerColoration
+        type: multiband_waveshaper
+        description: "Post-compression transformer saturation"
+        bands:
+          low: "20-200Hz, heavy saturation (iron character)"
+          mid: "200Hz-2kHz, gentle saturation (glue)"
+          high: "2kHz-20kHz, minimal saturation (air preservation)"
+
+      - name: MixBlend
+        type: crossfade
+        description: "Equal-power dry/wet mix for parallel compression"
+
+  parameters:
+    - id: threshold
+      name: "Threshold"
+      range: [-60.0, 0.0]
+      default: -20.0
+      unit: "dB"
+      curve: linear
+      smoothing_ms: 50
+
+    - id: ratio
+      name: "Ratio"
+      range: [2.0, 10.0]
+      default: 4.0
+      unit: ":1"
+      curve: linear
+      smoothing_ms: 50
+
+    - id: attack
+      name: "Attack"
+      range: [0.1, 100.0]
+      default: 10.0
+      unit: "ms"
+      curve: logarithmic
+      smoothing_ms: 20
+
+    - id: release
+      name: "Release"
+      range: [50.0, 1000.0]
+      default: 400.0
+      unit: "ms"
+      curve: logarithmic
+      smoothing_ms: 20
+
+    - id: fat
+      name: "FAT"
+      range: [0.0, 100.0]
+      default: 50.0
+      unit: "%"
+      curve: linear
+      smoothing_ms: 100
+      visual_priority: primary
+
+    - id: output
+      name: "Output"
+      range: [-24.0, 24.0]
+      default: 0.0
+      unit: "dB"
+      curve: linear
+      smoothing_ms: 50
+
+    - id: mix
+      name: "Mix"
+      range: [0.0, 100.0]
+      default: 100.0
+      unit: "%"
+      curve: linear
+      smoothing_ms: 50
+
+  metering:
+    - id: input_level
+      type: vu_meter
+      range: [-60.0, 12.0]
+      ballistics: "VU-style (300ms)"
+
+    - id: gain_reduction
+      type: gr_meter
+      range: [0.0, 24.0]
+      ballistics: "Fast attack (10ms), medium release (100ms)"
+
+    - id: output_level
+      type: vu_meter
+      range: [-60.0, 12.0]
+      ballistics: "VU-style (300ms)"
+
+  cpu_optimization:
+    - "Oversampling only on saturation stages (not full chain)"
+    - "Shared oversampling buffers for tube + transformer"
+    - "Bypass FAT stages when FAT = 0% (clean mode)"
+    - "Pre-calculate soft-knee coefficients on parameter change"
+    - "SIMD-friendly processing via juce::dsp::AudioBlock"
+
+  juce_modules:
+    - juce_dsp
+    - juce_audio_processors
+    - juce_audio_basics
+
+surface:
+  type: webview
+  size: [800, 500]
+  aesthetic: "modern_minimal"
+  mockup: "ui/mockup-final.html"
+
+  preset_system:
+    enabled: true
+    factory_presets: 20
+    categories: [Drums, Vocals, Bass, Mix Bus]
+    user_presets: true
+    storage: filesystem
+
+  colors:
+    background: "#0a0a0a"
+    primary: "#ff9500"      # Warm amber for FAT
+    secondary: "#2a2a2a"    # Dark gray panels
+    accent: "#ffb84d"       # Lighter amber glow
+    text: "#e0e0e0"         # Light gray text
+    meter: "#4a9eff"        # Cool blue for meters
+    gr: "#ff5555"           # Red for gain reduction
+
+  layout:
+    sections:
+      - id: header
+        height: 50
+        elements: [logo, preset_system, company]
+
+      - id: main
+        height: 280
+        elements:
+          - id: compression_graph
+            type: interactive_graph
+            features: [threshold_drag, ratio_drag, soft_knee_curve]
+            meters: [input, gr, output]
+          - id: fat_knob
+            type: hero_knob
+            position: right
+
+      - id: controls
+        height: 130
+        elements: [threshold, ratio, attack, release, output, mix]
+
+      - id: footer
+        height: 24
+        elements: [copyright]
+
+  features:
+    preset_system: true
+    interactive_graph: true
+    graph_linked_controls: [threshold, ratio]
+
+craft:
+  tasks:
+    - id: task_001
+      title: "Setup CMake project and plugin scaffold"
+      description: "Create CMakeLists.txt, PluginProcessor, PluginEditor stubs"
+
+    - id: task_002
+      title: "Implement APVTS parameters"
+      description: "Create all 7 parameters with ranges and smoothing"
+
+    - id: task_003
+      title: "Implement SidechainDetector"
+      description: "Hybrid RMS-Peak detection (70/30 mix)"
+
+    - id: task_004
+      title: "Implement EnvelopeFollower"
+      description: "Optical-style ballistics with two-stage release"
+
+    - id: task_005
+      title: "Implement GainComputer"
+      description: "Soft-knee compression curve (6dB knee)"
+
+    - id: task_006
+      title: "Implement TubeSaturation"
+      description: "Pre-compression waveshaper with FAT control"
+
+    - id: task_007
+      title: "Implement TransformerColoration"
+      description: "Post-compression multiband saturation"
+
+    - id: task_008
+      title: "Implement CompressorCore"
+      description: "Orchestrate all DSP stages with oversampling"
+
+    - id: task_009
+      title: "Implement WebView UI"
+      description: "Port mockup HTML, add JUCE bindings, preset system"
+
+    - id: task_010
+      title: "Implement interactive compression graph"
+      description: "Draggable threshold/ratio, real-time curve update"
+
+    - id: task_011
+      title: "Implement metering"
+      description: "Input/Output levels, Gain Reduction meter"
+
+    - id: task_012
+      title: "Integration and testing"
+      description: "Connect all components, test in DAW"
+
+presets:
+  storage:
+    base_path: "~/Library/Application Support/Sylfo/FatPressor"
+    factory_dir: "Factory"
+    user_dir: "User"
+    extension: ".fppreset"
+
+  categories:
+    - Drums
+    - Vocals
+    - Bass
+    - Mix Bus
+
+  factory:
+    - category: Drums
+      presets:
+        - Punchy Kick
+        - Snare Snap
+        - Room Glue
+        - Parallel Smash
+        - Drum Bus
+    - category: Vocals
+      presets:
+        - Gentle Lead
+        - Radio Ready
+        - Intimate
+        - De-Harsh
+        - Background Vox
+    - category: Bass
+      presets:
+        - Tight Low
+        - Tube Warmth
+        - Slap Bass
+        - Sub Control
+        - Vintage Bass
+    - category: Mix Bus
+      presets:
+        - Glue Master
+        - Loud & Proud
+        - Transparent
+        - Analog Sum
+        - Final Touch
+
+verify:
+  pluginval: pending
+  user_tests: []
+
+launch:
+  licensing:
+    provider: none
+  formats:
+    - vst3
+    - au
+    - standalone
+  platforms:
+    - macos
+    - windows
