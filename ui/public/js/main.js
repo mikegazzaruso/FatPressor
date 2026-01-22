@@ -353,33 +353,9 @@ function updateMeters(data) {
 // ============================================
 
 function updateCurveGlow() {
-  // On Windows, we use CSS drop-shadow which doesn't support dynamic intensity
-  // The CSS fallback provides a static but visually correct glow
+  // On Windows, WebView2 breaks ALL blur filters - skip entirely
+  // CSS handles brighter colors, no dynamic glow on Windows
   if (document.body.classList.contains('windows')) {
-    // For Windows: update CSS filter intensity based on output level
-    const intensity = Math.max(0, Math.min(1, (currentOutputLevel + 60) / 60));
-    const compressionCurve = document.getElementById('compressionCurve');
-    const thresholdPoint = document.getElementById('thresholdPoint');
-
-    if (compressionCurve) {
-      const blur1 = 4 + intensity * 8;
-      const blur2 = 8 + intensity * 12;
-      const opacity = 0.4 + intensity * 0.4;
-      compressionCurve.style.filter = `
-        drop-shadow(0 0 ${blur1}px rgba(255, 149, 0, ${opacity}))
-        drop-shadow(0 0 ${blur2}px rgba(255, 149, 0, ${opacity * 0.7}))
-      `;
-    }
-
-    if (thresholdPoint) {
-      const blur1 = 6 + intensity * 10;
-      const blur2 = 12 + intensity * 16;
-      const opacity = 0.5 + intensity * 0.4;
-      thresholdPoint.style.filter = `
-        drop-shadow(0 0 ${blur1}px rgba(255, 149, 0, ${opacity}))
-        drop-shadow(0 0 ${blur2}px rgba(255, 149, 0, ${opacity * 0.7}))
-      `;
-    }
     return;
   }
 

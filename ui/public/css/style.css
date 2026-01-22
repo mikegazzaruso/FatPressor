@@ -1179,57 +1179,52 @@ text {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* ==================== WINDOWS GLOW FALLBACK ==================== */
-/* WebView2 (Edge/Chromium) has issues with SVG feGaussianBlur filters */
-/* They render as squares instead of blur. Use CSS drop-shadow instead */
+/* ==================== WINDOWS FALLBACK ==================== */
+/* WebView2 has issues with ALL blur filters (SVG and CSS drop-shadow) */
+/* On Windows: NO filters, just brighter colors to simulate glow effect */
 
-/* Compression curve glow - Windows fallback */
+/* Compression curve - Windows: no filter, brighter stroke */
 .windows .compression-curve {
-  filter: drop-shadow(0 0 4px #ff9500)
-          drop-shadow(0 0 8px #ff9500)
-          drop-shadow(0 0 12px rgba(255, 149, 0, 0.6));
+  filter: none !important;
+  stroke: #ffb347;
+  stroke-width: 4;
 }
 
-/* Threshold point glow - Windows fallback */
+/* Threshold point - Windows: no filter, brighter fill */
 .windows .threshold-point {
-  filter: drop-shadow(0 0 6px #ff9500)
-          drop-shadow(0 0 12px #ff9500)
-          drop-shadow(0 0 20px rgba(255, 149, 0, 0.7));
+  filter: none !important;
+  fill: #ffb347;
 }
 
-/* Knob arc glow - Windows fallback (orange/linked) */
-.windows .knob-arc-progress.linked {
-  filter: drop-shadow(0 0 4px #ff9500)
-          drop-shadow(0 0 8px #ff9500)
-          drop-shadow(0 0 12px rgba(255, 149, 0, 0.6));
-}
-
-/* Knob arc glow - Windows fallback (gray/default) */
+/* Knob arc - Windows: no filter, brighter colors */
 .windows .knob-arc-progress {
-  filter: drop-shadow(0 0 4px #888888)
-          drop-shadow(0 0 8px #888888)
-          drop-shadow(0 0 12px rgba(136, 136, 136, 0.6));
+  filter: none !important;
+  stroke: #aaaaaa;
+  stroke-width: 5;
 }
 
-/* Knob arc glow - Windows fallback (blue) */
+.windows .knob-arc-progress.linked {
+  filter: none !important;
+  stroke: #ffb347;
+  stroke-width: 5;
+}
+
 .windows .knob-arc-progress.blue {
-  filter: drop-shadow(0 0 4px #1a5fa8)
-          drop-shadow(0 0 8px #1a5fa8)
-          drop-shadow(0 0 12px rgba(26, 95, 168, 0.6));
+  filter: none !important;
+  stroke: #4a90d9;
+  stroke-width: 5;
 }
 
-/* Knob arc glow - Windows fallback (pink) */
 .windows .knob-arc-progress.pink {
-  filter: drop-shadow(0 0 4px #ff5555)
-          drop-shadow(0 0 8px #ff5555)
-          drop-shadow(0 0 12px rgba(255, 85, 85, 0.6));
+  filter: none !important;
+  stroke: #ff7777;
+  stroke-width: 5;
 }
 
-/* FAT knob arc glow - Windows fallback (intense orange) */
+/* FAT knob arc - Windows: thicker stroke, brighter color */
 .windows .fat-knob .knob-arc-progress {
-  filter: drop-shadow(0 0 8px #ff9500)
-          drop-shadow(0 0 16px #ff9500)
-          drop-shadow(0 0 28px #ff9500)
-          drop-shadow(0 0 40px rgba(255, 149, 0, 0.7));
+  filter: none !important;
+  stroke: #ffb347;
+  stroke-width: 6;
 }
 
