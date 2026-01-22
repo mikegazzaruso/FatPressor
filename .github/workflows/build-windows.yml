@@ -1,0 +1,104 @@
+# FatPressor Windows Build Workflow
+# Builds VST3 and Standalone for Windows x64
+# Triggered on push to main branch
+
+name: Build Windows x64
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    name: Windows x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Clone JUCE
+        run: |
+          git clone --depth 1 --branch 8.0.4 https://github.com/juce-framework/JUCE.git C:/JUCE
+
+      - name: Download WebView2 SDK
+        shell: pwsh
+        run: |
+          $version = "1.0.1823.32"
+          # JUCE expects: [PACKAGE_LOCATION]/Microsoft.Web.WebView2.VERSION/build/native/include/
+          $baseDir = "D:\webview2"
+          $pkgDir = "$baseDir\Microsoft.Web.WebView2.$version"
+
+          New-Item -ItemType Directory -Path $pkgDir -Force | Out-Null
+
+          # Download WebView2 NuGet package
+          $url = "https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/$version"
+          $zipFile = "D:\webview2.nupkg"
+
+          Write-Host "Downloading WebView2 SDK v$version..."
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Invoke-WebRequest -Uri $url -OutFile $zipFile -UseBasicParsing
+          Write-Host "Download complete. File size: $((Get-Item $zipFile).Length) bytes"
+
+          Write-Host "Extracting to $pkgDir..."
+          Expand-Archive -Path $zipFile -DestinationPath $pkgDir -Force
+
+          # Verify expected structure for JUCE
+          $headerPath = "$pkgDir\build\native\include\WebView2.h"
+          if (Test-Path $headerPath) {
+            Write-Host "SUCCESS: Found WebView2.h at $headerPath"
+          } else {
+            Write-Host "ERROR: WebView2.h not found!"
+            exit 1
+          }
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          $sdkPath = "D:\webview2"
+          Write-Host "JUCE_WEBVIEW2_PACKAGE_LOCATION: $sdkPath"
+
+          New-Item -ItemType Directory -Path build -Force | Out-Null
+          Set-Location build
+          cmake .. -G "Visual Studio 17 2022" -A x64 `
+            -DJUCE_PATH="C:/JUCE" `
+            "-DJUCE_WEBVIEW2_PACKAGE_LOCATION=$sdkPath"
+
+      - name: Build Release
+        run: |
+          cd build
+          cmake --build . --config Release
+
+      - name: Copy WebView2Loader.dll
+        shell: pwsh
+        run: |
+          $webview2Dll = "D:\webview2\Microsoft.Web.WebView2.1.0.1823.32\build\native\x64\WebView2Loader.dll"
+          if (Test-Path $webview2Dll) {
+            # Copy to Standalone
+            $standalonePath = "build\FatPressor_artefacts\Release\Standalone"
+            if (Test-Path $standalonePath) {
+              Copy-Item $webview2Dll -Destination $standalonePath -Force
+              Write-Host "Copied WebView2Loader.dll to Standalone"
+            }
+            # Copy to VST3
+            $vst3Path = "build\FatPressor_artefacts\Release\VST3\FatPressor.vst3\Contents\x86_64-win"
+            if (Test-Path $vst3Path) {
+              Copy-Item $webview2Dll -Destination $vst3Path -Force
+              Write-Host "Copied WebView2Loader.dll to VST3"
+            }
+          } else {
+            Write-Host "WARNING: WebView2Loader.dll not found at $webview2Dll"
+          }
+
+      - name: Upload VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: FatPressor-Windows-x64-VST3
+          path: build/FatPressor_artefacts/Release/VST3/
+
+      - name: Upload Standalone
+        uses: actions/upload-artifact@v4
+        with:
+          name: FatPressor-Windows-x64-Standalone
+          path: build/FatPressor_artefacts/Release/Standalone/

@@ -51,6 +51,7 @@ juce_add_plugin(FatPressor
 
     # WebView support (REQUIRED for WebView UI)
     NEEDS_WEB_BROWSER TRUE
+    NEEDS_WEBVIEW2 TRUE          # Windows WebView2 support
 )
 
 # Source files
@@ -103,6 +104,7 @@ juce_generate_juce_header(FatPressor)
 target_compile_definitions(FatPressor
     PUBLIC
         JUCE_WEB_BROWSER=1
+        JUCE_USE_WIN_WEBVIEW2=1   # Enable WebView2 on Windows
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_DISPLAY_SPLASH_SCREEN=0
