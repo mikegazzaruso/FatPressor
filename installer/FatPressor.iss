@@ -2,7 +2,7 @@
 ; Requires Inno Setup 6.x
 
 #define MyAppName "FatPressor"
-#define MyAppVersion "0.2.0"
+#define MyAppVersion "0.2.1"
 #define MyAppPublisher "Sylfo"
 #define MyAppURL "https://sylfo.space"
 

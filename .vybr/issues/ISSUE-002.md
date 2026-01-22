@@ -73,7 +73,14 @@ Low - isolated to UI styling, no DSP changes
 - [ISSUE] Test: Verify glow rendering on Windows
 
 ## Resolved
-[pending]
+2026-01-22
 
 ## Version
 0.2.0 → 0.2.1
+
+## Final Solution
+WebView2 breaks ALL blur filters (SVG and CSS drop-shadow). Solution:
+- No filters at all on Windows (`filter: none !important`)
+- Brighter colors to simulate glow (#ffb347 instead of #ff9500)
+- Thicker strokes (5px instead of 4px)
+- FAT text-shadow unchanged (works on Windows)

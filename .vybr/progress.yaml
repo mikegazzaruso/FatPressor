@@ -8,8 +8,8 @@ current:
   task_title: null
 
   resume:
-    context: "Version 0.2.0 complete. Preset system working with delete. Credits overlay on logo. Debug panel removed."
-    next_action: "Continue with additional enhancements or proceed to LAUNCH"
+    context: "ISSUE-002 resolved. Windows glow fixed by removing filters and using brighter colors."
+    next_action: "Continue with LAUNCH or additional fixes"
 
 stages:
   concept: done
@@ -80,7 +80,16 @@ enhancements:
 
 # FIX workflow tracking
 issues:
-  resolved: []
+  resolved:
+    - id: "ISSUE-002"
+      title: "SVG glow renders as squares on Windows WebView2"
+      version: "0.2.0 → 0.2.1"
+      date: "2026-01-22"
+      tasks:
+        - id: fatpressor_issue_002_fix
+          title: "[ISSUE] Fix: Windows SVG glow rendering"
+        - id: fatpressor_issue_002_test
+          title: "[ISSUE] Test: Verify glow on Windows"
   active: null
   active_tasks:
     done: []
