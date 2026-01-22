@@ -1,5 +1,5 @@
 # FatPressor Windows Build Workflow
-# Builds VST3 and Standalone for Windows x64
+# Builds VST3, Standalone, and Installer for Windows x64
 # Triggered on push to main branch
 
 name: Build Windows x64
@@ -73,6 +73,7 @@ jobs:
       - name: Copy WebView2Loader.dll
         shell: pwsh
         run: |
+          # WebView2Loader.dll is REQUIRED at runtime for WebView2 to work
           $webview2Dll = "D:\webview2\Microsoft.Web.WebView2.1.0.1823.32\build\native\x64\WebView2Loader.dll"
           if (Test-Path $webview2Dll) {
             # Copy to Standalone
@@ -81,7 +82,7 @@ jobs:
               Copy-Item $webview2Dll -Destination $standalonePath -Force
               Write-Host "Copied WebView2Loader.dll to Standalone"
             }
-            # Copy to VST3
+            # Copy to VST3 (inside the bundle)
             $vst3Path = "build\FatPressor_artefacts\Release\VST3\FatPressor.vst3\Contents\x86_64-win"
             if (Test-Path $vst3Path) {
               Copy-Item $webview2Dll -Destination $vst3Path -Force
@@ -90,6 +91,14 @@ jobs:
           } else {
             Write-Host "WARNING: WebView2Loader.dll not found at $webview2Dll"
           }
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+
+      - name: Build Installer
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\FatPressor.iss
 
       - name: Upload VST3
         uses: actions/upload-artifact@v4
@@ -102,3 +111,9 @@ jobs:
         with:
           name: FatPressor-Windows-x64-Standalone
           path: build/FatPressor_artefacts/Release/Standalone/
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: FatPressor-Windows-x64-Installer
+          path: build/installer/FatPressor-*-Windows-Setup.exe
