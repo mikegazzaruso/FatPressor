@@ -1179,3 +1179,57 @@ text {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+/* ==================== WINDOWS GLOW FALLBACK ==================== */
+/* WebView2 (Edge/Chromium) has issues with SVG feGaussianBlur filters */
+/* They render as squares instead of blur. Use CSS drop-shadow instead */
+
+/* Compression curve glow - Windows fallback */
+.windows .compression-curve {
+  filter: drop-shadow(0 0 4px #ff9500)
+          drop-shadow(0 0 8px #ff9500)
+          drop-shadow(0 0 12px rgba(255, 149, 0, 0.6));
+}
+
+/* Threshold point glow - Windows fallback */
+.windows .threshold-point {
+  filter: drop-shadow(0 0 6px #ff9500)
+          drop-shadow(0 0 12px #ff9500)
+          drop-shadow(0 0 20px rgba(255, 149, 0, 0.7));
+}
+
+/* Knob arc glow - Windows fallback (orange/linked) */
+.windows .knob-arc-progress.linked {
+  filter: drop-shadow(0 0 4px #ff9500)
+          drop-shadow(0 0 8px #ff9500)
+          drop-shadow(0 0 12px rgba(255, 149, 0, 0.6));
+}
+
+/* Knob arc glow - Windows fallback (gray/default) */
+.windows .knob-arc-progress {
+  filter: drop-shadow(0 0 4px #888888)
+          drop-shadow(0 0 8px #888888)
+          drop-shadow(0 0 12px rgba(136, 136, 136, 0.6));
+}
+
+/* Knob arc glow - Windows fallback (blue) */
+.windows .knob-arc-progress.blue {
+  filter: drop-shadow(0 0 4px #1a5fa8)
+          drop-shadow(0 0 8px #1a5fa8)
+          drop-shadow(0 0 12px rgba(26, 95, 168, 0.6));
+}
+
+/* Knob arc glow - Windows fallback (pink) */
+.windows .knob-arc-progress.pink {
+  filter: drop-shadow(0 0 4px #ff5555)
+          drop-shadow(0 0 8px #ff5555)
+          drop-shadow(0 0 12px rgba(255, 85, 85, 0.6));
+}
+
+/* FAT knob arc glow - Windows fallback (intense orange) */
+.windows .fat-knob .knob-arc-progress {
+  filter: drop-shadow(0 0 8px #ff9500)
+          drop-shadow(0 0 16px #ff9500)
+          drop-shadow(0 0 28px #ff9500)
+          drop-shadow(0 0 40px rgba(255, 149, 0, 0.7));
+}
+

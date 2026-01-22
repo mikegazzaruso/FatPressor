@@ -353,7 +353,37 @@ function updateMeters(data) {
 // ============================================
 
 function updateCurveGlow() {
-  // Get SVG filter blur elements
+  // On Windows, we use CSS drop-shadow which doesn't support dynamic intensity
+  // The CSS fallback provides a static but visually correct glow
+  if (document.body.classList.contains('windows')) {
+    // For Windows: update CSS filter intensity based on output level
+    const intensity = Math.max(0, Math.min(1, (currentOutputLevel + 60) / 60));
+    const compressionCurve = document.getElementById('compressionCurve');
+    const thresholdPoint = document.getElementById('thresholdPoint');
+
+    if (compressionCurve) {
+      const blur1 = 4 + intensity * 8;
+      const blur2 = 8 + intensity * 12;
+      const opacity = 0.4 + intensity * 0.4;
+      compressionCurve.style.filter = `
+        drop-shadow(0 0 ${blur1}px rgba(255, 149, 0, ${opacity}))
+        drop-shadow(0 0 ${blur2}px rgba(255, 149, 0, ${opacity * 0.7}))
+      `;
+    }
+
+    if (thresholdPoint) {
+      const blur1 = 6 + intensity * 10;
+      const blur2 = 12 + intensity * 16;
+      const opacity = 0.5 + intensity * 0.4;
+      thresholdPoint.style.filter = `
+        drop-shadow(0 0 ${blur1}px rgba(255, 149, 0, ${opacity}))
+        drop-shadow(0 0 ${blur2}px rgba(255, 149, 0, ${opacity * 0.7}))
+      `;
+    }
+    return;
+  }
+
+  // macOS/Safari: use SVG filters (they work correctly)
   const curveBlur1 = document.getElementById('curveBlur1');
   const curveBlur2 = document.getElementById('curveBlur2');
   const pointBlur1 = document.getElementById('pointBlur1');
@@ -1138,10 +1168,34 @@ function setupCreditsOverlay() {
 }
 
 // ============================================
+// WINDOWS PLATFORM DETECTION
+// ============================================
+
+function detectWindowsPlatform() {
+  // Detect Windows via User-Agent
+  const isWindows = navigator.userAgent.includes('Windows');
+
+  if (isWindows) {
+    console.log('[FatPressor] Windows detected - using CSS glow fallback');
+    document.body.classList.add('windows');
+
+    // Remove SVG filter attributes (they render as squares on WebView2)
+    // The CSS will handle glow via drop-shadow instead
+    const elementsWithFilters = document.querySelectorAll('[filter]');
+    elementsWithFilters.forEach(el => {
+      el.removeAttribute('filter');
+    });
+  }
+}
+
+// ============================================
 // INITIALIZATION
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Detect Windows and apply CSS fallback for glow effects
+  detectWindowsPlatform();
+
   // Setup credits overlay
   setupCreditsOverlay();
 
